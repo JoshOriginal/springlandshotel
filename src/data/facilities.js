@@ -1,0 +1,16 @@
+export const facilities = [
+  { name: "Outdoor swimming pool", note: "Take a refreshing pause between adventures." },
+  { name: "Tropical gardens", note: "Outdoor spaces for a slower moment." },
+  { name: "Restaurant", note: "A welcoming place to enjoy a meal." },
+  { name: "Café", note: "A relaxed spot for a coffee break." },
+  { name: "Garden bar", note: "Enjoy a drink in the garden setting." },
+  { name: "Massage & relaxation", note: "Relaxation services are available." },
+  { name: "Housekeeping", note: "Professional housekeeping service." },
+  { name: "Wi-Fi", note: "Complimentary Wi-Fi in designated areas." },
+  { name: "Laundry", note: "Laundry service may incur additional charges." },
+  { name: "Reception & assistance", note: "Reception and guest assistance." },
+  { name: "Luggage storage", note: "Luggage storage for guests." },
+  { name: "Trekking equipment", note: "Equipment rental for trekking." },
+  { name: "Transfers & transport", note: "Airport transfers and transport assistance." },
+  { name: "On-site parking", note: "Parking is available on site." },
+];
