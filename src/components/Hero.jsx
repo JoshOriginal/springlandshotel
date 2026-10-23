@@ -1,38 +1,80 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { heroSlides } from "../data/imageManifest.js";
 import { hotel } from "../data/hotel.js";
 
-function shuffle(items) {
-  const shuffled = [...items];
-  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+function shuffleSlides(items) {
+  const uniqueSlides = items.filter(
+    (slide, index) => slide?.image?.filename
+      && items.findIndex((item) => item?.image?.filename === slide.image.filename) === index,
+  );
+
+  for (let index = uniqueSlides.length - 1; index > 0; index -= 1) {
     const swapIndex = Math.floor(Math.random() * (index + 1));
-    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+    [uniqueSlides[index], uniqueSlides[swapIndex]] = [uniqueSlides[swapIndex], uniqueSlides[index]];
   }
-  return shuffled;
+  return uniqueSlides;
 }
 
 export default function Hero() {
-  const [slides] = useState(() => shuffle(heroSlides));
+  const [slides] = useState(() => shuffleSlides(heroSlides));
   const [activeIndex, setActiveIndex] = useState(0);
   const [previousIndex, setPreviousIndex] = useState(null);
   const [paused, setPaused] = useState(false);
+  const [loadError, setLoadError] = useState("");
   const [reducedMotion, setReducedMotion] = useState(
     () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
   );
   const swipeStart = useRef(null);
+  const requestId = useRef(0);
+  const imageCache = useRef(new Map());
   const activeSlide = slides[activeIndex];
   const previousSlide = previousIndex === null ? null : slides[previousIndex];
   const nextIndex = (activeIndex + 1) % slides.length;
 
-  const showSlide = (index) => {
-    if (index === activeIndex) return;
-    setPreviousIndex(activeIndex);
-    setActiveIndex(index);
-  };
+  const preloadSlide = useCallback((slide, priority = "low") => {
+    const filename = slide?.image?.filename;
+    if (!filename) return Promise.reject(new Error("The selected hero slide has no image."));
 
-  const changeSlide = (direction) => {
+    const cached = imageCache.current.get(filename);
+    if (cached) {
+      if (priority === "high") cached.image.fetchPriority = "high";
+      return cached.promise;
+    }
+
+    const image = new window.Image();
+    image.sizes = "100vw";
+    image.srcset = slide.image.srcSet;
+    image.fetchPriority = priority;
+    image.src = slide.image.src;
+    const loaded = image.decode().then(() => image).catch((error) => {
+      if (image.naturalWidth > 0) return image;
+      imageCache.current.delete(filename);
+      throw new Error(`Unable to load the hero photograph "${filename}".`, { cause: error });
+    });
+    imageCache.current.set(filename, { image, promise: loaded });
+    return loaded;
+  }, []);
+
+  const showSlide = useCallback(async (index) => {
+    if (index === activeIndex) return;
+    const request = ++requestId.current;
+
+    try {
+      await preloadSlide(slides[index], "high");
+      if (request !== requestId.current) return;
+      setLoadError("");
+      setPreviousIndex(activeIndex);
+      setActiveIndex(index);
+    } catch (error) {
+      if (request !== requestId.current) return;
+      console.error(error);
+      setLoadError(`The photograph "${slides[index].image.filename}" could not be loaded.`);
+    }
+  }, [activeIndex, preloadSlide, slides]);
+
+  const changeSlide = useCallback((direction) => {
     showSlide((activeIndex + direction + slides.length) % slides.length);
-  };
+  }, [activeIndex, showSlide, slides.length]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -43,31 +85,26 @@ export default function Hero() {
 
   useEffect(() => {
     if (paused || reducedMotion || slides.length < 2) return undefined;
-    const timer = window.setInterval(() => {
-      setPreviousIndex(activeIndex);
-      setActiveIndex((index) => (index + 1) % slides.length);
-    }, 6000);
-    return () => window.clearInterval(timer);
-  }, [activeIndex, paused, reducedMotion, slides.length]);
+    const timer = window.setTimeout(() => changeSlide(1), 6000);
+    return () => window.clearTimeout(timer);
+  }, [activeIndex, changeSlide, loadError, paused, reducedMotion, slides.length]);
 
   useEffect(() => {
     if (!previousSlide) return undefined;
-    const timer = window.setTimeout(() => setPreviousIndex(null), 1200);
+    const timer = window.setTimeout(() => setPreviousIndex(null), 1300);
     return () => window.clearTimeout(timer);
   }, [previousSlide]);
 
   useEffect(() => {
-    const nextImage = slides[nextIndex]?.image;
-    if (!nextImage) return undefined;
-    const preload = new window.Image();
-    preload.sizes = "100vw";
-    preload.srcset = nextImage.srcSet;
-    preload.src = nextImage.src;
-    return () => {
-      preload.onload = null;
-      preload.onerror = null;
-    };
-  }, [nextIndex, slides]);
+    if (!slides[nextIndex]) return undefined;
+    let cancelled = false;
+    preloadSlide(slides[nextIndex]).catch((error) => {
+      if (cancelled) return;
+      console.error(error);
+      setLoadError(`The next photograph "${slides[nextIndex].image.filename}" could not be preloaded.`);
+    });
+    return () => { cancelled = true; };
+  }, [nextIndex, preloadSlide, slides]);
 
   const handlePointerDown = (event) => {
     if (event.pointerType === "touch") {
@@ -84,6 +121,8 @@ export default function Hero() {
       changeSlide(deltaX < 0 ? 1 : -1);
     }
   };
+
+  if (!activeSlide) return null;
 
   return (
     <section
@@ -139,8 +178,10 @@ export default function Hero() {
           width={activeSlide.image.originalDimensions.width}
           height={activeSlide.image.originalDimensions.height}
           alt={activeSlide.image.alt}
-          fetchPriority={activeIndex === 0 ? "high" : "auto"}
+          fetchPriority="high"
+          loading="eager"
           decoding="async"
+          style={{ objectPosition: activeSlide.objectPosition || "center 52%" }}
         />
         <figcaption>{activeSlide.caption}</figcaption>
       </figure>
@@ -148,18 +189,34 @@ export default function Hero() {
         <p className="eyebrow"><span /> Moshi, Tanzania <span className="eyebrow-divider">·</span> Kilimanjaro region</p>
         <h1 id="hero-title">{hotel.headline}</h1>
         <p className="hero-tagline">
-          Where comfort meets adventure,<br />and every stay feels like home.
+          Springlands Hotel – Where Comfort Meets Adventure, and Every Stay Feels Like Home.
         </p>
         <p className="hero-description">
           Springlands Hotel offers a welcoming escape in Moshi, where comfort, nature, and authentic Tanzanian hospitality meet.
         </p>
         <div className="hero-actions">
-          <a className="button button-dark" href="#enquiry">Book your stay <span aria-hidden="true">↗</span></a>
+          <a className="button button-dark" href="/contact#enquiry">Book your stay <span aria-hidden="true">↗</span></a>
           <a className="button hero-secondary-action" href="#accommodation">Explore Our Rooms <span aria-hidden="true">↓</span></a>
         </div>
       </div>
+      <button
+        className="hero-arrow hero-arrow-previous"
+        type="button"
+        aria-label="Previous photograph"
+        onClick={() => changeSlide(-1)}
+      >
+        <span aria-hidden="true">←</span>
+      </button>
+      <button
+        className="hero-arrow hero-arrow-next"
+        type="button"
+        aria-label="Next photograph"
+        onClick={() => changeSlide(1)}
+      >
+        <span aria-hidden="true">→</span>
+      </button>
       <div className="hero-controls" role="group" aria-label="Hero image controls">
-        <div className="hero-indicators" aria-label="Choose a hotel photograph">
+        <div className="hero-indicators" role="group" aria-label="Choose a hotel photograph">
           {slides.map((slide, index) => (
             <button
               key={slide.image.filename}
@@ -171,16 +228,11 @@ export default function Hero() {
             />
           ))}
         </div>
-        <button className="hero-arrow" type="button" aria-label="Previous photograph" onClick={() => changeSlide(-1)}>
-          <span aria-hidden="true">←</span>
-        </button>
-        <span className="hero-slide-count" aria-hidden="true">
+        <span className="hero-slide-count" aria-label={`Photograph ${activeIndex + 1} of ${slides.length}`}>
           {String(activeIndex + 1).padStart(2, "0")} <span>/</span> {String(slides.length).padStart(2, "0")}
         </span>
-        <button className="hero-arrow" type="button" aria-label="Next photograph" onClick={() => changeSlide(1)}>
-          <span aria-hidden="true">→</span>
-        </button>
       </div>
+      {loadError && <span className="visually-hidden" role="status">{loadError}</span>}
       <a className="scroll-cue" href="#about"><span /> Discover Springlands</a>
     </section>
   );
