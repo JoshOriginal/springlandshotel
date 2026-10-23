@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { hotel } from "./data/hotel.js";
 import Header from "./components/Header.jsx";
 import Hero from "./components/Hero.jsx";
+import PageBanner from "./components/PageBanner.jsx";
 import EnquirySection from "./components/EnquirySection.jsx";
 import Footer from "./components/Footer.jsx";
 import ScrollExperience from "./components/ScrollExperience.jsx";
@@ -15,33 +16,132 @@ import {
   RoomsSection,
 } from "./components/Sections.jsx";
 
+const pages = {
+  "/": {
+    title: "Springlands Hotel | Moshi, Tanzania",
+    description: "Discover Springlands Hotel in Moshi, Tanzania: comfortable accommodation, tropical gardens, a swimming pool, and warm Tanzanian hospitality.",
+  },
+  "/about": {
+    title: "About Springlands Hotel | Moshi, Tanzania",
+    description: "Get to know Springlands Hotel, a welcoming place to pause before the climb, after the safari, or whenever Moshi calls.",
+    heading: "A welcome in Moshi",
+    image: "about",
+  },
+  "/rooms": {
+    title: "Accommodation | Springlands Hotel",
+    description: "Explore the room options at Springlands Hotel in Moshi, including single, twin, quadruple, five-bed, and special Jacuzzi accommodation.",
+    heading: "Accommodation",
+    image: "rooms",
+  },
+  "/facilities": {
+    title: "Facilities & Dining | Springlands Hotel",
+    description: "Explore the facilities and guest comforts at Springlands Hotel in Moshi, Tanzania.",
+    heading: "Facilities & Dining",
+    image: "facilities",
+  },
+  "/experiences": {
+    title: "Experiences | Springlands Hotel",
+    description: "Discover northern Tanzania experiences from a welcoming base in Moshi.",
+    heading: "Experiences",
+    image: "experiences",
+  },
+  "/gallery": {
+    title: "Photo Gallery | Springlands Hotel",
+    description: "View photographs of Springlands Hotel, its accommodation, facilities, gardens, and nearby experiences.",
+    heading: "Gallery",
+    image: "gallery",
+  },
+  "/contact": {
+    title: "Contact & Enquiries | Springlands Hotel",
+    description: "Find Springlands Hotel in Moshi, Tanzania, and send an accommodation enquiry directly to the hotel.",
+    heading: "Contact & Enquiries",
+    image: "contact",
+  },
+};
+
+function HomePage({ onSelectRoom }) {
+  return (
+    <>
+      <Hero />
+      <div className="brand-strip">
+        <span>{hotel.location}</span>
+        <span className="strip-flower" aria-hidden="true">✳</span>
+        <span>Mount Kilimanjaro</span>
+        <span className="strip-flower" aria-hidden="true">✳</span>
+        <span>Warm Tanzanian hospitality</span>
+      </div>
+      <AboutSection />
+      <RoomsSection onSelectRoom={onSelectRoom} preview />
+      <FacilitiesSection preview />
+      <ExperiencesSection preview />
+      <GallerySection preview />
+      <FaqSection />
+      <div className="home-contact-cta">
+        <p className="eyebrow">Planning a stay?</p>
+        <a className="button button-dark" href="/contact">Get in touch <span aria-hidden="true">↗</span></a>
+      </div>
+    </>
+  );
+}
+
+function PageContent({ path, onSelectRoom, roomPreference }) {
+  switch (path) {
+    case "/about":
+      return <AboutSection />;
+    case "/rooms":
+      return <RoomsSection onSelectRoom={onSelectRoom} />;
+    case "/facilities":
+      return <FacilitiesSection />;
+    case "/experiences":
+      return <ExperiencesSection />;
+    case "/gallery":
+      return <GallerySection />;
+    case "/contact":
+      return (
+        <>
+          <ContactSection />
+          <FaqSection />
+          <EnquirySection
+            roomPreference={roomPreference}
+            onRoomPreferenceChange={onSelectRoom}
+          />
+        </>
+      );
+    default:
+      return <HomePage onSelectRoom={onSelectRoom} />;
+  }
+}
+
 export default function App() {
-  const [roomPreference, setRoomPreference] = useState("");
+  const currentPath = pages[window.location.pathname.replace(/\/+$/, "") || "/"]
+    ? window.location.pathname.replace(/\/+$/, "") || "/"
+    : "/";
+  const page = pages[currentPath];
+  const [roomPreference, setRoomPreference] = useState(
+    () => new URLSearchParams(window.location.search).get("room") || "",
+  );
+
+  useEffect(() => {
+    document.title = page.title;
+    const description = document.querySelector('meta[name="description"]');
+    if (description) description.content = page.description;
+    const socialTitle = document.querySelector('meta[property="og:title"]');
+    if (socialTitle) socialTitle.content = page.title;
+    const socialDescription = document.querySelector('meta[property="og:description"]');
+    if (socialDescription) socialDescription.content = page.description;
+  }, [page]);
 
   return (
     <>
       <a className="skip-link" href="#main">Skip to content</a>
       <ScrollExperience />
-      <Header />
+      <Header currentPath={currentPath} />
       <main id="main">
-        <Hero />
-        <div className="brand-strip">
-          <span>{hotel.location}</span>
-          <span className="strip-flower" aria-hidden="true">✳</span>
-          <span>Mount Kilimanjaro</span>
-          <span className="strip-flower" aria-hidden="true">✳</span>
-          <span>Warm Tanzanian hospitality</span>
-        </div>
-        <AboutSection />
-        <RoomsSection onSelectRoom={setRoomPreference} />
-        <FacilitiesSection />
-        <ExperiencesSection />
-        <GallerySection />
-        <FaqSection />
-        <ContactSection />
-        <EnquirySection
+        {currentPath !== "/" && <PageBanner heading={page.heading} imageKey={page.image} />}
+        <PageContent
+          path={currentPath}
+          onSelectRoom={setRoomPreference}
           roomPreference={roomPreference}
-          onRoomPreferenceChange={setRoomPreference}
         />
       </main>
       <Footer />

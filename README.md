@@ -1,6 +1,6 @@
 # Springlands Hotel website
 
-A responsive React and Vite landing page for Springlands Hotel in Moshi, Tanzania. Tailwind CSS is available through the Vite plugin; the bespoke page styling lives in `src/index.css`.
+A responsive React and Vite website for Springlands Hotel in Moshi, Tanzania. Tailwind CSS is available through the Vite plugin; the bespoke page styling lives in `src/index.css`.
 
 ## Run locally
 
@@ -10,6 +10,10 @@ npm run dev
 ```
 
 Create a production build with `npm run build`.
+
+## Pages and navigation
+
+The site provides directly addressable Home (`/`), About Us (`/about`), Accommodation (`/rooms`), Facilities & Dining (`/facilities`), Experiences (`/experiences`), Gallery (`/gallery`), and Contact (`/contact`) pages. Shared navigation marks the active page, page titles and descriptions update by route, and the home page links to full section pages. Room enquiries can pass the selected room to the contact form, and gallery images can open directly in the lightbox. `vercel.json` rewrites page routes to the Vite entry point so direct links and refreshes work on Vercel.
 
 ## Content and asset audit
 

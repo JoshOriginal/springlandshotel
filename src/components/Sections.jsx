@@ -53,7 +53,7 @@ export function AboutSection() {
           <p className="lead">{`A peaceful place to land before the climb, after the safari, or simply whenever Moshi calls.`}</p>
           <p>{`Settle into comfortable accommodation, unwind in tropical gardens, cool off in the outdoor pool, and enjoy dining with a friendly team. Springlands welcomes solo travelers, couples, groups, climbers, safari travelers, and holidaymakers.`}</p>
           <p className="family-note">Part of the wider Zara Tanzania Adventures hospitality family.</p>
-          <a className="text-link text-link-green" href="#facilities">Get to know the hotel <span aria-hidden="true">→</span></a>
+          <a className="text-link text-link-green" href="/facilities">Get to know the hotel <span aria-hidden="true">→</span></a>
         </div>
       </div>
       <div className="about-stats" aria-label="Hotel highlights">
@@ -65,9 +65,10 @@ export function AboutSection() {
   );
 }
 
-export function RoomsSection({ onSelectRoom }) {
+export function RoomsSection({ onSelectRoom, preview = false }) {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const roomDialogRef = useRef(null);
+  const displayedRooms = preview ? rooms.slice(0, 3) : rooms;
 
   useEffect(() => {
     const dialog = roomDialogRef.current;
@@ -86,7 +87,7 @@ export function RoomsSection({ onSelectRoom }) {
         <p className="section-intro">From a quiet solo stay to a room shared with your trekking team, choose the accommodation that suits your time in Moshi.</p>
       </div>
       <div className="room-grid">
-        {rooms.map((room, index) => (
+        {displayedRooms.map((room, index) => (
           <article className={`room-card room-card-${index + 1}`} key={room.name}>
             {roomImages[room.name].image ? (
               <button
@@ -124,13 +125,14 @@ export function RoomsSection({ onSelectRoom }) {
               <ul className="feature-list">
                 {room.features.map((feature) => <li key={feature}>{feature}</li>)}
               </ul>
-              <a className="room-link" href="#enquiry" onClick={() => onSelectRoom(room.name)}>
+              <a className="room-link" href={`/contact?room=${encodeURIComponent(room.name)}#enquiry`} onClick={() => onSelectRoom(room.name)}>
                 Enquire about this room <span aria-hidden="true">↗</span>
               </a>
             </div>
           </article>
         ))}
       </div>
+      {preview && <a className="section-more-link" href="/rooms">Explore all accommodation <span aria-hidden="true">→</span></a>}
       <dialog
         className="room-dialog"
         ref={roomDialogRef}
@@ -181,7 +183,7 @@ export function RoomsSection({ onSelectRoom }) {
             </ul>
             <a
               className="button button-dark"
-              href="#enquiry"
+              href={`/contact?room=${encodeURIComponent(selectedRoom.name)}#enquiry`}
               onClick={() => {
                 onSelectRoom(selectedRoom.name);
                 roomDialogRef.current?.close();
@@ -196,7 +198,10 @@ export function RoomsSection({ onSelectRoom }) {
   );
 }
 
-export function FacilitiesSection() {
+export function FacilitiesSection({ preview = false }) {
+  const displayedFacilities = preview ? facilities.slice(0, 6) : facilities;
+  const displayedFacilityImages = preview ? facilityImages.slice(0, 3) : facilityImages;
+
   return (
     <section className="section facilities-section" id="facilities">
       <div className="section-index">03 <span>·</span> THOUGHTFUL COMFORTS</div>
@@ -205,10 +210,10 @@ export function FacilitiesSection() {
           <p className="eyebrow">Make yourself at home</p>
           <h2><span className="heading-reveal-line">Little comforts.</span><span className="heading-reveal-line"><em>More moments.</em></span></h2>
           <p>Everything you need to settle in, recharge, and get ready for what comes next.</p>
-          <a className="button button-light" href="#enquiry">Ask about your stay <span aria-hidden="true">↗</span></a>
+          <a className="button button-light" href="/contact#enquiry">Ask about your stay <span aria-hidden="true">↗</span></a>
         </div>
         <div className="facilities-list">
-          {facilities.map((facility, index) => (
+          {displayedFacilities.map((facility, index) => (
             <article className="facility-item" key={facility.name}>
               <span className="facility-index">0{index + 1}</span>
               <div><h3>{facility.name}</h3><p>{facility.note}</p></div>
@@ -218,7 +223,7 @@ export function FacilitiesSection() {
         </div>
       </div>
       <div className="facility-photos">
-        {facilityImages.map((image) => (
+        {displayedFacilityImages.map((image) => (
           <figure key={image.filename}>
             <img
               src={image.src}
@@ -233,11 +238,14 @@ export function FacilitiesSection() {
           </figure>
         ))}
       </div>
+      {preview && <a className="section-more-link section-more-link-light" href="/facilities">View all facilities & services <span aria-hidden="true">→</span></a>}
     </section>
   );
 }
 
-export function ExperiencesSection() {
+export function ExperiencesSection({ preview = false }) {
+  const displayedAttractions = preview ? attractions.slice(0, 3) : attractions;
+
   return (
     <section className="section experiences-section" id="experiences">
       <div className="section-index">04 <span>·</span> OUT AND ABOUT</div>
@@ -248,11 +256,11 @@ export function ExperiencesSection() {
         </div>
         <div className="experience-aside">
           <p>Make Springlands your welcoming base for exploring the region. Ask the hotel about local experiences and transport assistance.</p>
-          <a className="text-link text-link-green" href="#enquiry">Ask about local experiences <span aria-hidden="true">→</span></a>
+          <a className="text-link text-link-green" href="/contact#enquiry">Ask about local experiences <span aria-hidden="true">→</span></a>
         </div>
       </div>
       <div className="experience-grid">
-        {attractions.map((place, index) => {
+        {displayedAttractions.map((place, index) => {
           const image = attractionImages[place.imageKey];
           return (
             <article
@@ -264,9 +272,7 @@ export function ExperiencesSection() {
                   className="experience-image-trigger"
                   type="button"
                   aria-label={`Open image in gallery: ${image.alt}`}
-                  onClick={() => window.dispatchEvent(new CustomEvent("springlands:open-gallery-image", {
-                    detail: { filename: image.filename },
-                  }))}
+                  onClick={() => { window.location.href = `/gallery?image=${encodeURIComponent(image.filename)}`; }}
                 >
                   <img
                     className="experience-image"
@@ -292,20 +298,39 @@ export function ExperiencesSection() {
           );
         })}
       </div>
+      {preview && <a className="section-more-link" href="/experiences">Discover all experiences <span aria-hidden="true">→</span></a>}
     </section>
   );
 }
 
-export function GallerySection() {
+export function GallerySection({ preview = false }) {
   const [activeGalleryIndex, setActiveGalleryIndex] = useState(null);
+  const [activeCategory, setActiveCategory] = useState("All");
   const galleryDialogRef = useRef(null);
   const activeImage = activeGalleryIndex === null ? null : galleryImages[activeGalleryIndex];
+  const categories = ["All", "Hotel", "Rooms", "Facilities", "Experiences"];
+  const categoryForImage = (image) => {
+    if (image.selectedFor.includes("experiences") || /attraction|waterfall|hot spring|forest|safari|culture|mountain/i.test(image.category)) return "Experiences";
+    if (image.selectedFor.includes("rooms") || /accommodation|bedroom/i.test(image.category)) return "Rooms";
+    if (image.selectedFor.includes("facilities") || /pool|garden|café|cafe|relaxation|dining/i.test(image.category)) return "Facilities";
+    return "Hotel";
+  };
+  const filteredImages = preview
+    ? galleryImages.slice(0, 6)
+    : galleryImages.filter((image) => activeCategory === "All" || categoryForImage(image) === activeCategory);
 
   useEffect(() => {
     const dialog = galleryDialogRef.current;
     if (activeImage && dialog && !dialog.open) dialog.showModal();
     if (!activeImage && dialog?.open) dialog.close();
   }, [activeImage]);
+
+  useEffect(() => {
+    const filename = new URLSearchParams(window.location.search).get("image");
+    if (!filename) return;
+    const index = galleryImages.findIndex((image) => image.filename === filename);
+    if (index >= 0) setActiveGalleryIndex(index);
+  }, []);
 
   useEffect(() => {
     if (activeGalleryIndex === null) return undefined;
@@ -323,14 +348,10 @@ export function GallerySection() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [activeGalleryIndex]);
 
-  useEffect(() => {
-    const openGalleryImage = (event) => {
-      const index = galleryImages.findIndex((image) => image.filename === event.detail?.filename);
-      if (index >= 0) setActiveGalleryIndex(index);
-    };
-    window.addEventListener("springlands:open-gallery-image", openGalleryImage);
-    return () => window.removeEventListener("springlands:open-gallery-image", openGalleryImage);
-  }, []);
+  const closeGallery = () => {
+    setActiveGalleryIndex(null);
+    if (window.location.search) window.history.replaceState(null, "", `${window.location.pathname}${window.location.hash}`);
+  };
 
   return (
     <section className="section gallery-section" id="gallery">
@@ -342,8 +363,25 @@ export function GallerySection() {
         </div>
         <p>Selected photographs of the hotel, rooms, gardens, and guest spaces.</p>
       </div>
+      {!preview && (
+        <div className="gallery-filters" role="group" aria-label="Filter gallery photographs">
+          {categories.map((category) => (
+            <button
+              key={category}
+              className={`gallery-filter${activeCategory === category ? " is-active" : ""}`}
+              type="button"
+              aria-pressed={activeCategory === category}
+              onClick={() => setActiveCategory(category)}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+      )}
       <div className="gallery-grid">
-        {galleryImages.map((image, index) => (
+        {filteredImages.map((image) => {
+          const index = galleryImages.findIndex((galleryImage) => galleryImage.filename === image.filename);
+          return (
           <figure key={image.filename}>
             <button
               className="gallery-trigger"
@@ -363,22 +401,24 @@ export function GallerySection() {
               <span className="gallery-caption">{image.subject}</span>
             </button>
           </figure>
-        ))}
+          );
+        })}
       </div>
+      {preview && <a className="section-more-link" href="/gallery">View the full gallery <span aria-hidden="true">→</span></a>}
       <dialog
         className="gallery-dialog"
         ref={galleryDialogRef}
         aria-label="Photo gallery"
-        onClose={() => setActiveGalleryIndex(null)}
+        onClose={closeGallery}
         onCancel={(event) => {
           event.preventDefault();
-          setActiveGalleryIndex(null);
+          closeGallery();
           event.currentTarget.close();
         }}
         onKeyDown={(event) => {
           if (event.key === "Escape") {
             event.preventDefault();
-            setActiveGalleryIndex(null);
+            closeGallery();
             galleryDialogRef.current?.close();
           }
         }}

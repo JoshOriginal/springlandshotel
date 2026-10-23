@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
 import { springlandsLogo } from "../data/brandAssets.js";
 
-const links = [
-  ["About", "#about"],
-  ["Accommodation", "#accommodation"],
-  ["Facilities", "#facilities"],
-  ["Experiences", "#experiences"],
-  ["Gallery", "#gallery"],
-  ["Contact", "#contact"],
+export const siteNavigation = [
+  { label: "Home", href: "/", path: "/" },
+  { label: "About Us", href: "/about", path: "/about" },
+  { label: "Accommodation", href: "/rooms", path: "/rooms" },
+  { label: "Facilities & Dining", href: "/facilities", path: "/facilities" },
+  { label: "Experiences", href: "/experiences", path: "/experiences" },
+  { label: "Gallery", href: "/gallery", path: "/gallery" },
+  { label: "Contact", href: "/contact", path: "/contact" },
 ];
 
-export default function Header() {
+export default function Header({ currentPath = "/" }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -24,8 +25,8 @@ export default function Header() {
   const closeMenu = () => setMenuOpen(false);
 
   return (
-    <header className={`site-header${scrolled ? " is-scrolled" : ""}`}>
-      <a className="brand" href="#home" onClick={closeMenu} aria-label="Springlands Hotel home">
+    <header className={`site-header${scrolled ? " is-scrolled" : ""}${currentPath !== "/" ? " site-header-inner" : ""}`}>
+      <a className="brand" href={currentPath === "/" ? "#home" : "/"} onClick={closeMenu} aria-label="Springlands Hotel home">
         <img className="brand-logo" src={springlandsLogo.src} alt={springlandsLogo.alt} />
         <span className="brand-name">
           <strong>Springlands</strong>
@@ -48,10 +49,10 @@ export default function Header() {
         className={`primary-nav${menuOpen ? " is-open" : ""}`}
         aria-label="Primary navigation"
       >
-        {links.map(([label, href]) => (
-          <a key={label} href={href} onClick={closeMenu}>{label}</a>
+        {siteNavigation.map(({ label, href, path }) => (
+          <a key={path} href={href} onClick={closeMenu} aria-current={currentPath === path ? "page" : undefined}>{label}</a>
         ))}
-        <a className="nav-cta" href="#enquiry" onClick={closeMenu}>Book your stay</a>
+        <a className="nav-cta" href="/contact#enquiry" onClick={closeMenu}>Book Your Stay</a>
       </nav>
     </header>
   );
