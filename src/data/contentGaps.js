@@ -7,12 +7,12 @@ export const contentGaps = [
   {
     item: "Contact and address",
     detail:
-      "Only Moshi, Tanzania, is confirmed. Add the hotel's exact address, phone number, and email after verification.",
+      "Moshi, Tanzania, the client-supplied map coordinates, and WhatsApp number +255 753 997 777 are confirmed. No street address or email was supplied.",
   },
   {
     item: "Booking submission",
     detail:
-      "No booking engine, backend, or confirmed enquiry destination was supplied. The current form validates locally and does not send messages.",
+      "The enquiry form opens a pre-filled WhatsApp message to the confirmed hotel number. It does not check availability, create reservations, or store personal information; the guest must send the message in WhatsApp.",
   },
   {
     item: "Video",

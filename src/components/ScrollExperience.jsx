@@ -46,6 +46,7 @@ export default function ScrollExperience() {
         siblingCounts.set(parent, index + 1);
         target.style.setProperty("--reveal-delay", `${Math.min(index, 5) * 70}ms`);
         target.classList.add("motion-reveal");
+        if (target.matches(".hero-copy")) target.classList.add("is-visible");
       });
       observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
@@ -54,7 +55,9 @@ export default function ScrollExperience() {
           observer.unobserve(entry.target);
         });
       }, { threshold: 0.12, rootMargin: "0px" });
-      revealTargets.forEach((target) => observer.observe(target));
+      revealTargets.forEach((target) => {
+        if (!target.classList.contains("is-visible")) observer.observe(target);
+      });
       document.documentElement.classList.add("motion-enhanced");
     }
 

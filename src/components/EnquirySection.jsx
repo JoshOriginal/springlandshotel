@@ -15,9 +15,11 @@ const initialValues = {
 export default function EnquirySection({ roomPreference, onRoomPreferenceChange }) {
   const [values, setValues] = useState(initialValues);
   const [notice, setNotice] = useState("");
+  const [whatsAppFallback, setWhatsAppFallback] = useState("");
 
   const update = (event) => {
     setNotice("");
+    setWhatsAppFallback("");
     setValues((current) => ({ ...current, [event.target.name]: event.target.value }));
     if (event.target.name === "room") onRoomPreferenceChange(event.target.value);
   };
@@ -28,7 +30,29 @@ export default function EnquirySection({ roomPreference, onRoomPreferenceChange 
       setNotice("Please choose a departure date later than your arrival date.");
       return;
     }
-    setNotice("Your details look complete, but no message was sent. The hotel’s confirmed enquiry method or booking connection is not yet configured.");
+
+    const message = [
+      "Hello Springlands Hotel, I would like to enquire about accommodation.",
+      `Name: ${values.name}`,
+      `Email: ${values.email}`,
+      values.phone && `Telephone: ${values.phone}`,
+      `Arrival: ${values.arrival}`,
+      `Departure: ${values.departure}`,
+      `Guests: ${values.guests}`,
+      (roomPreference || values.room) && `Room preference: ${roomPreference || values.room}`,
+      values.message && `Additional message: ${values.message}`,
+    ].filter(Boolean).join("\n");
+    const url = `https://wa.me/255753997777?text=${encodeURIComponent(message)}`;
+    const chatWindow = window.open(url, "_blank");
+
+    if (chatWindow) {
+      chatWindow.opener = null;
+      setWhatsAppFallback("");
+      setNotice("Your enquiry is ready in WhatsApp. Review it there and press Send to contact the hotel.");
+    } else {
+      setWhatsAppFallback(url);
+      setNotice("Your WhatsApp enquiry is ready. Open WhatsApp to review and send it to the hotel.");
+    }
   };
 
   return (
@@ -38,11 +62,11 @@ export default function EnquirySection({ roomPreference, onRoomPreferenceChange 
         <h2><span className="heading-reveal-line">Your next adventure</span><span className="heading-reveal-line">starts <em>here.</em></span></h2>
         <p>Preparing for Kilimanjaro, returning from safari, or planning a peaceful getaway? Springlands Hotel welcomes you.</p>
         <div className="enquiry-promise"><span>01</span><p>Share your stay details and preferred room.</p></div>
-        <div className="enquiry-promise"><span>02</span><p>The form is a preview only; your enquiry will not be sent yet.</p></div>
+        <div className="enquiry-promise"><span>02</span><p>Review and send your enquiry directly in WhatsApp.</p></div>
       </div>
       <form className="enquiry-form" onSubmit={submit}>
-        <div className="form-heading"><h3>Plan your stay</h3><span>ENQUIRY PREVIEW</span></div>
-        <p className="form-notice">This form does not send or store your information. A verified hotel contact or booking integration is needed before launch.</p>
+        <div className="form-heading"><h3>Plan your stay</h3><span>CONTACT THE HOTEL</span></div>
+        <p className="form-notice">Your stay details open in WhatsApp so you can review your enquiry before sending it.</p>
         <div className="form-grid">
           <label>Full name<input name="name" autoComplete="name" value={values.name} onChange={update} required /></label>
           <label>Email address<input name="email" type="email" autoComplete="email" value={values.email} onChange={update} required /></label>
@@ -58,8 +82,11 @@ export default function EnquirySection({ roomPreference, onRoomPreferenceChange 
           </label>
           <label className="form-wide">Additional message<textarea name="message" rows="3" value={values.message} onChange={update} /></label>
         </div>
-        <button className="button button-dark form-submit" type="submit">Review enquiry <span aria-hidden="true">↗</span></button>
-        <p className="form-status" role="status" aria-live="polite">{notice}</p>
+        <button className="button button-dark form-submit" type="submit">Continue in WhatsApp <span aria-hidden="true">↗</span></button>
+        <p className="form-status" role="status" aria-live="polite">
+          {notice}
+          {whatsAppFallback && <> <a href={whatsAppFallback} target="_blank" rel="noopener noreferrer">Open WhatsApp</a></>}
+        </p>
       </form>
     </section>
   );

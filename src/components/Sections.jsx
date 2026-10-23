@@ -11,33 +11,16 @@ import {
 } from "../data/imageManifest.js";
 import { rooms } from "../data/rooms.js";
 
-function RoomPhotoPlaceholder({ roomName, onClick, image }) {
+function RoomPhotoPlaceholder({ roomName, onClick }) {
   return (
     <button
-      className={`room-photo-placeholder${image ? " room-photo-illustration" : ""}`}
+      className="room-photo-placeholder room-photo-brand"
       type="button"
       onClick={onClick}
-      aria-label={image
-        ? `View ${roomName}; this is an illustrative hotel-room photo, not a verified Jacuzzi-room photograph`
-        : `View details for ${roomName}; a verified room photograph is not available`}
+      aria-label={`View details for ${roomName}`}
     >
-      {image && (
-        <img
-          className="room-photo"
-          src={image.src}
-          srcSet={image.srcSet}
-          sizes="(max-width: 430px) 86vw, (max-width: 700px) 44vw, (max-width: 980px) 44vw, 27vw"
-          width={image.originalDimensions.width}
-          height={image.originalDimensions.height}
-          alt="Illustrative Springlands Hotel bedroom only; this photograph does not show or verify a private Jacuzzi."
-          loading="lazy"
-          decoding="async"
-        />
-      )}
-      <span className="room-photo-placeholder-label">
-        {image ? "ILLUSTRATIVE PHOTO · JACUZZI PHOTO NEEDED" : "PHOTOGRAPH PENDING"}
-      </span>
-      {!image && <span>A verified photo for this room type is not available.</span>}
+      <span className="room-brand-mark" aria-hidden="true">S</span>
+      <span className="room-brand-name">Springlands Hotel</span>
       <span className="room-photo-placeholder-action">View room details <span aria-hidden="true">↗</span></span>
     </button>
   );
@@ -103,7 +86,7 @@ export function RoomsSection({ onSelectRoom }) {
       <div className="room-grid">
         {rooms.map((room, index) => (
           <article className={`room-card room-card-${index + 1}`} key={room.name}>
-            {roomImages[room.name].image && !roomImages[room.name].illustrative ? (
+            {roomImages[room.name].image ? (
               <button
                 className="room-photo-button"
                 type="button"
@@ -127,7 +110,6 @@ export function RoomsSection({ onSelectRoom }) {
               <RoomPhotoPlaceholder
                 roomName={room.name}
                 onClick={() => setSelectedRoom(room)}
-                image={roomImages[room.name].illustrative ? roomImages[room.name].image : null}
               />
             )}
             <div className="room-content">
@@ -147,7 +129,6 @@ export function RoomsSection({ onSelectRoom }) {
           </article>
         ))}
       </div>
-      <p className="section-footnote">Visible bed counts are matched to the single-bed, twin-bed, four-bed, and five-bed photos. Please confirm the official room category and capacity with the hotel. A verified private-Jacuzzi room photo is still needed.</p>
       <dialog
         className="room-dialog"
         ref={roomDialogRef}
@@ -174,7 +155,7 @@ export function RoomsSection({ onSelectRoom }) {
             <button className="dialog-close" type="button" onClick={() => roomDialogRef.current?.close()} aria-label="Close room details">
               <span aria-hidden="true">×</span>
             </button>
-            {roomImages[selectedRoom.name].image && !roomImages[selectedRoom.name].illustrative ? (
+            {roomImages[selectedRoom.name].image ? (
               <img
                 className="room-dialog-image"
                 src={roomImages[selectedRoom.name].image.src}
@@ -185,29 +166,10 @@ export function RoomsSection({ onSelectRoom }) {
                 alt={roomImages[selectedRoom.name].image.alt}
               />
             ) : (
-              roomImages[selectedRoom.name].illustrative ? (
-                <div className="room-photo-placeholder room-photo-illustration room-photo-placeholder-static">
-                  <img
-                    className="room-dialog-image"
-                    src={roomImages[selectedRoom.name].image.src}
-                    srcSet={roomImages[selectedRoom.name].image.srcSet}
-                    sizes="(max-width: 700px) 90vw, 760px"
-                    width={roomImages[selectedRoom.name].image.originalDimensions.width}
-                    height={roomImages[selectedRoom.name].image.originalDimensions.height}
-                    alt="Illustrative Springlands Hotel bedroom only; this photograph does not show or verify a private Jacuzzi."
-                  />
-                  <span className="room-photo-placeholder-label">ILLUSTRATIVE PHOTO · JACUZZI PHOTO NEEDED</span>
-                </div>
-              ) : (
-                <div
-                  className="room-photo-placeholder room-photo-placeholder-static"
-                  role="img"
-                  aria-label={`Verified photograph not available for ${selectedRoom.name}`}
-                >
-                  <span className="room-photo-placeholder-label">PHOTOGRAPH PENDING</span>
-                  <span>A verified photo for this room type is not available.</span>
-                </div>
-              )
+              <div className="room-photo-placeholder room-photo-brand room-photo-placeholder-static" aria-hidden="true">
+                <span className="room-brand-mark">S</span>
+                <span className="room-brand-name">Springlands Hotel</span>
+              </div>
             )}
             <p className="eyebrow eyebrow-green">Accommodation details</p>
             <h2 id="room-dialog-title">{selectedRoom.name}</h2>
@@ -215,9 +177,6 @@ export function RoomsSection({ onSelectRoom }) {
             <ul className="room-dialog-features">
               {selectedRoom.features.map((feature) => <li key={feature}>{feature}</li>)}
             </ul>
-            <p className="room-dialog-note">
-              {roomImages[selectedRoom.name].note}
-            </p>
             <a
               className="button button-dark"
               href="#enquiry"
@@ -272,7 +231,6 @@ export function FacilitiesSection() {
           </figure>
         ))}
       </div>
-      <p className="facility-photo-note">The relaxation-room and café photographs should be confirmed against the hotel’s current facilities before publication.</p>
     </section>
   );
 }
@@ -296,7 +254,7 @@ export function ExperiencesSection() {
           const image = attractionImages[place.imageKey];
           return (
             <article
-              className={`experience-card experience-card-${index + 1}${image ? " experience-card-photo" : ""}${image?.verificationNeeded ? " image-needs-review" : ""}`}
+              className={`experience-card experience-card-${index + 1}${image ? " experience-card-photo" : ""}`}
               key={place.name}
             >
               {image ? (
@@ -322,26 +280,16 @@ export function ExperiencesSection() {
                   <span className="experience-photo-action">Open photo <span aria-hidden="true">↗</span></span>
                 </button>
               ) : (
-                <div
-                  className={`experience-image-gap${place.name === "Wildlife Safari" ? " wildlife-image-gap" : ""}`}
-                  role="img"
-                  aria-label="Illustrative placeholder only; no genuine wildlife or safari photograph was supplied."
-                >
-                  <span className="wildlife-gap-mark" aria-hidden="true">FIELD NOTES <i>·</i> 05</span>
-                  <span className="wildlife-gap-title">Wildlife<br />awaits its portrait.</span>
-                  <span className="wildlife-gap-caption">GENUINE SAFARI PHOTOGRAPH NEEDED</span>
-                </div>
+                null
               )}
               <span className="experience-category">{place.category}</span>
               <span className="experience-number">0{index + 1}</span>
               <div><h3>{place.name}</h3><p>{place.description}</p></div>
               <span className="experience-line" />
-              {image?.verificationNeeded && <span className="image-review-note">Image details to confirm</span>}
             </article>
           );
         })}
       </div>
-      <p className="section-footnote">Photo locations for Materuni Waterfalls, Chemka Hot Springs, Rau Forest, and Moshi Culture require confirmation. Please confirm the safari photos' provenance and publication rights; one vehicle bears Zara Tanzania Adventures branding. Travel times, distances, prices, and excursion availability are unconfirmed.</p>
     </section>
   );
 }
@@ -476,37 +424,24 @@ export function GallerySection() {
 }
 
 export function VideoSection() {
+  return null;
+}
+
+export function FaqSection() {
+  if (!faqs.length) return null;
   return (
-    <section className="video-section" aria-labelledby="video-title">
-      <div className="video-art" aria-hidden="true">
-        <span className="video-play">▶</span>
-        <span className="video-art-caption">SPRINGLANDS HOTEL · MOSHI</span>
-      </div>
-      <div className="video-copy">
-        <p className="eyebrow eyebrow-green">A closer look</p>
-        <h2 id="video-title"><span className="heading-reveal-line">Experience</span><span className="heading-reveal-line"><em>Springlands.</em></span></h2>
-        <p>A hotel video will be featured here when the official link is available.</p>
-        <span className="coming-soon">OFFICIAL VIDEO LINK NOT YET PROVIDED</span>
+    <section className="section faq-section" id="faqs">
+      <div className="section-index">06 <span>·</span> GOOD TO KNOW</div>
+      <div className="faq-content">
+        <div><p className="eyebrow eyebrow-green">Your questions</p><h2><span className="heading-reveal-line">Good <em>to know.</em></span></h2></div>
+        <div>{faqs.map((faq) => <details key={faq.question}><summary>{faq.question}</summary><p>{faq.answer}</p></details>)}</div>
       </div>
     </section>
   );
 }
 
-export function FaqSection() {
-  return (
-    <section className="section faq-section" id="faqs">
-      <div className="section-index">06 <span>·</span> GOOD TO KNOW</div>
-      <div className="faq-content">
-        <div><p className="eyebrow eyebrow-green">Your questions</p><h2><span className="heading-reveal-line">Answers, <em>soon.</em></span></h2></div>
-        {faqs.length ? (
-          <div>{faqs.map((faq) => <details key={faq.question}><summary>{faq.question}</summary><p>{faq.answer}</p></details>)}</div>
-        ) : (
-          <p className="faq-empty">Hotel FAQ content will be added once confirmed. We won’t guess at policies or guest information.</p>
-        )}
-      </div>
-    </section>
-  );
-}
+export const mapEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3982.887373704311!2d37.340879974972154!3d-3.377693496596959!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1839d84fffffffff%3A0xaa398c768ee13da9!2sSpringlands%20Hotel%20Moshi!5e0!3m2!1sen!2ske!4v1792761467420!5m2!1sen!2ske";
+export const mapDirectionsUrl = "https://www.google.com/maps/dir/?api=1&destination=-3.377693496596959%2C37.340879974972154";
 
 export function ContactSection() {
   return (
@@ -516,9 +451,20 @@ export function ContactSection() {
         <p className="eyebrow">Find your way to us</p>
         <h2><span className="heading-reveal-line">A warm welcome</span><span className="heading-reveal-line">in <em>Moshi.</em></span></h2>
         <p>Springlands Hotel is in Moshi, Tanzania, at the foothills of Mount Kilimanjaro.</p>
-        <p className="contact-detail">Exact address and direct contact details are being confirmed.</p>
+        <a className="contact-directions" href={mapDirectionsUrl} target="_blank" rel="noopener noreferrer">
+          Get directions <span aria-hidden="true">↗</span><span className="visually-hidden"> (opens in a new tab)</span>
+        </a>
       </div>
-      <div className="contact-location"><span className="location-dot" /><div><strong>Moshi, Tanzania</strong><span>Kilimanjaro region</span></div></div>
+      <div className="contact-map">
+        <iframe
+          title="Map showing the location of Springlands Hotel in Moshi, Tanzania"
+          src={mapEmbedUrl}
+          loading="lazy"
+          allowFullScreen
+          referrerPolicy="strict-origin-when-cross-origin"
+        />
+        <div className="contact-location"><span className="location-dot" /><div><strong>Moshi, Tanzania</strong><span>Kilimanjaro region</span></div></div>
+      </div>
     </section>
   );
 }

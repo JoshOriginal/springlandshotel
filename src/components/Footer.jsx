@@ -1,4 +1,5 @@
 import { hotel } from "../data/hotel.js";
+import { faqs } from "../data/faqs.js";
 import { springlandsLogo } from "../data/brandAssets.js";
 
 const footerLinks = [
@@ -21,13 +22,14 @@ export default function Footer() {
         <p>{hotel.tagline}</p>
         <nav aria-label="Footer navigation">
           {footerLinks.map(([label, href]) => <a href={href} key={label}>{label}</a>)}
-          <a href="#faqs">FAQs</a>
+          {faqs.length > 0 && <a href="#faqs">FAQs</a>}
         </nav>
         <a className="footer-book" href="#enquiry">Plan your stay <span aria-hidden="true">↗</span></a>
       </div>
       <div className="footer-bottom">
         <span>© {new Date().getFullYear()} Springlands Hotel</span>
         <span>Where comfort meets adventure.</span>
+        <a className="footer-partner" href="https://www.zaratanzaniaadventures.com/" target="_blank" rel="noopener noreferrer">Zara Tanzania Adventures<span className="visually-hidden"> (opens in a new tab)</span></a>
         <a href="#home">Back to top ↑</a>
       </div>
     </footer>
