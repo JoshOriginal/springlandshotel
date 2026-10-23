@@ -1498,7 +1498,7 @@ body {
 }
 .hero-slide-active {
   z-index: 1;
-  animation: hero-photo-enter 1.15s ease both, hero-photo-zoom 7s ease-out forwards;
+  animation: hero-photo-enter 1.15s ease both, hero-photo-zoom 3s ease-out both;
 }
 .hero-slide-outgoing {
   z-index: 2;
@@ -1747,8 +1747,8 @@ body {
   to { opacity: 0; }
 }
 @keyframes hero-photo-zoom {
-  from { transform: scale(1.025); }
-  to { transform: scale(1.055); }
+  from { transform: scale(1); }
+  to { transform: scale(1.07); }
 }
 @media (max-width: 980px) {
   .hero.hero-carousel { padding-right: 7%; padding-left: 7%; }

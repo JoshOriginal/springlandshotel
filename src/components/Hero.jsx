@@ -85,7 +85,7 @@ export default function Hero() {
 
   useEffect(() => {
     if (paused || reducedMotion || slides.length < 2) return undefined;
-    const timer = window.setTimeout(() => changeSlide(1), 6000);
+    const timer = window.setTimeout(() => changeSlide(1), 3000);
     return () => window.clearTimeout(timer);
   }, [activeIndex, changeSlide, loadError, paused, reducedMotion, slides.length]);
 
