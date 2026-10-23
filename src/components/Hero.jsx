@@ -19,11 +19,8 @@ export default function Hero() {
   const [slides] = useState(() => shuffleSlides(heroSlides));
   const [activeIndex, setActiveIndex] = useState(0);
   const [previousIndex, setPreviousIndex] = useState(null);
-  const [paused, setPaused] = useState(false);
+  const [timerResetKey, setTimerResetKey] = useState(0);
   const [loadError, setLoadError] = useState("");
-  const [reducedMotion, setReducedMotion] = useState(
-    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-  );
   const swipeStart = useRef(null);
   const requestId = useRef(0);
   const imageCache = useRef(new Map());
@@ -56,6 +53,7 @@ export default function Hero() {
   }, []);
 
   const showSlide = useCallback(async (index) => {
+    setTimerResetKey((key) => key + 1);
     if (index === activeIndex) return;
     const request = ++requestId.current;
 
@@ -77,17 +75,13 @@ export default function Hero() {
   }, [activeIndex, showSlide, slides.length]);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const updateMotionPreference = () => setReducedMotion(mediaQuery.matches);
-    mediaQuery.addEventListener("change", updateMotionPreference);
-    return () => mediaQuery.removeEventListener("change", updateMotionPreference);
-  }, []);
-
-  useEffect(() => {
-    if (paused || reducedMotion || slides.length < 2) return undefined;
-    const timer = window.setTimeout(() => changeSlide(1), 3000);
+    if (slides.length < 2) return undefined;
+    const timer = window.setTimeout(() => {
+      setPreviousIndex(activeIndex);
+      setActiveIndex((index) => (index + 1) % slides.length);
+    }, 3000);
     return () => window.clearTimeout(timer);
-  }, [activeIndex, changeSlide, loadError, paused, reducedMotion, slides.length]);
+  }, [activeIndex, slides.length, timerResetKey]);
 
   useEffect(() => {
     if (!previousSlide) return undefined;
@@ -131,16 +125,6 @@ export default function Hero() {
       aria-labelledby="hero-title"
       aria-roledescription="carousel"
       aria-label="Springlands Hotel photography"
-      onPointerEnter={(event) => {
-        if (event.pointerType === "mouse") setPaused(true);
-      }}
-      onPointerLeave={(event) => {
-        if (event.pointerType === "mouse") setPaused(false);
-      }}
-      onFocus={() => setPaused(true)}
-      onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false);
-      }}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerCancel={() => { swipeStart.current = null; }}
