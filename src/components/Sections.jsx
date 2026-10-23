@@ -31,9 +31,23 @@ export function AboutSection() {
     <section className="section about-section" id="about">
       <div className="section-index">01 <span>·</span> A WELCOME IN MOSHI</div>
       <div className="about-grid">
-        <div>
-          <p className="eyebrow eyebrow-green">A place to pause</p>
-          <h2><span className="heading-reveal-line">Where comfort</span><span className="heading-reveal-line">meets <em>adventure.</em></span></h2>
+        <div className="about-lead-column">
+          <div>
+            <p className="eyebrow eyebrow-green">A place to pause</p>
+            <h2><span className="heading-reveal-line">Where comfort</span><span className="heading-reveal-line">meets <em>adventure.</em></span></h2>
+          </div>
+          <figure className="about-photo">
+            <img
+              src={aboutImage.src}
+              srcSet={aboutImage.srcSet}
+              sizes="(max-width: 700px) 100vw, 45vw"
+              width={aboutImage.originalDimensions.width}
+              height={aboutImage.originalDimensions.height}
+              alt={aboutImage.alt}
+              loading="lazy"
+            />
+            <figcaption>Springlands Hotel · Courtyard and gardens</figcaption>
+          </figure>
         </div>
         <div className="about-copy">
           <p className="lead">{`A peaceful place to land before the climb, after the safari, or simply whenever Moshi calls.`}</p>
@@ -42,18 +56,6 @@ export function AboutSection() {
           <a className="text-link text-link-green" href="#facilities">Get to know the hotel <span aria-hidden="true">→</span></a>
         </div>
       </div>
-      <figure className="about-photo">
-        <img
-          src={aboutImage.src}
-          srcSet={aboutImage.srcSet}
-          sizes="(max-width: 700px) 100vw, 82vw"
-          width={aboutImage.originalDimensions.width}
-          height={aboutImage.originalDimensions.height}
-          alt={aboutImage.alt}
-          loading="lazy"
-        />
-        <figcaption>Springlands Hotel · Courtyard and gardens</figcaption>
-      </figure>
       <div className="about-stats" aria-label="Hotel highlights">
         <div><strong>01</strong><span>Welcoming base<br />in Moshi</span></div>
         <div><strong>02</strong><span>Rest between<br />adventures</span></div>
