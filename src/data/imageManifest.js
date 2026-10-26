@@ -253,6 +253,8 @@ export const imageSelectionPlan = {
     "CYR03511.jpg",
     "CYR03525.jpg",
     "CYR03661.jpg",
+    "CYR04032.jpg",
+    "CYR04054.jpg",
     "CYR04114.jpg",
     "CYR04143.jpg",
     "CYR04194.jpg",
@@ -334,11 +336,11 @@ export const galleryImages = imageSelectionPlan.gallery
   .filter(Boolean);
 
 export const facilityImages = [
-  { filename: "IMG_3516.jpg", title: "Swimming pool", alt: "Outdoor swimming pool with loungers and the hotel building." },
-  { filename: "CYR03643.jpg", title: "Garden seating", alt: "Outdoor table and chairs among tropical plants." },
-  { filename: "CYR03511.jpg", title: "Covered garden patio", alt: "Outdoor table and chairs under a covered patio surrounded by tropical greenery." },
-  { filename: "CYR03851.jpg", title: "Café", alt: "Espresso machine and cups behind a café counter." },
-  { filename: "CYR03768.jpg", title: "Relaxation room", alt: "A prepared treatment table and furnishings in a quiet room." },
+  { filename: "IMG_3516.jpg", title: "Swimming Pool", description: "Take a refreshing pause between adventures.", alt: "Outdoor swimming pool with loungers and the hotel building." },
+  { filename: "CYR03643.jpg", title: "Garden Seating", description: "Outdoor spaces for a slower moment.", alt: "Outdoor table and chairs surrounded by tropical plants in a shaded garden." },
+  { filename: "CYR03511.jpg", title: "Covered Garden Patio", description: "Outdoor table and chairs beneath a covered garden patio.", alt: "Outdoor table and chairs under a covered patio surrounded by tropical greenery." },
+  { filename: "CYR03851.jpg", title: "Café", description: "A relaxed spot for a coffee break.", alt: "Espresso machine and cups behind the hotel café counter." },
+  { filename: "CYR03768.jpg", title: "Relaxation Room", description: "Relaxation services are available.", alt: "A prepared treatment table and furnishings in a quiet room." },
 ].map(({ filename, ...details }) => ({
   ...getImageByFilename(filename),
   ...details,
@@ -349,6 +351,7 @@ export const heroSlides = imageSelectionPlan.heroSlides
   .filter((slide) => slide.image);
 export const heroImage = getImageByFilename(imageSelectionPlan.hero);
 export const aboutImage = getImageByFilename(imageSelectionPlan.about);
+export const footerImage = getImageByFilename("CYR03832.jpg");
 export const roomOverviewImage = getImageByFilename(imageSelectionPlan.roomOverview);
 export const kilimanjaroImage = getImageByFilename(imageSelectionPlan.experiences.mountKilimanjaro);
 export const attractionImages = {

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { heroSlides } from "../data/imageManifest.js";
-import { hotel } from "../data/hotel.js";
 
 function shuffleSlides(items) {
   const uniqueSlides = items.filter(
@@ -169,19 +168,8 @@ export default function Hero() {
         />
         <figcaption>{activeSlide.caption}</figcaption>
       </figure>
-      <div className="hero-copy">
-        <p className="eyebrow"><span /> Moshi, Tanzania <span className="eyebrow-divider">·</span> Kilimanjaro region</p>
-        <h1 id="hero-title">{hotel.headline}</h1>
-        <p className="hero-tagline">
-          Springlands Hotel – Where Comfort Meets Adventure, and Every Stay Feels Like Home.
-        </p>
-        <p className="hero-description">
-          Springlands Hotel offers a welcoming escape in Moshi, where comfort, nature, and authentic Tanzanian hospitality meet.
-        </p>
-        <div className="hero-actions">
-          <a className="button button-dark" href="/contact#enquiry">Book your stay <span aria-hidden="true">↗</span></a>
-          <a className="button hero-secondary-action" href="#accommodation">Explore Our Rooms <span aria-hidden="true">↓</span></a>
-        </div>
+      <div className="hero-layout">
+        <h1 id="hero-title">Where comfort meets adventure.</h1>
       </div>
       <button
         className="hero-arrow hero-arrow-previous"
@@ -217,7 +205,7 @@ export default function Hero() {
         </span>
       </div>
       {loadError && <span className="visually-hidden" role="status">{loadError}</span>}
-      <a className="scroll-cue" href="#about"><span /> Discover Springlands</a>
+      <a className="scroll-cue" href="#about"><span /> Why stay with us?</a>
     </section>
   );
 }

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { hotel } from "./data/hotel.js";
 import Header from "./components/Header.jsx";
 import Hero from "./components/Hero.jsx";
 import PageBanner from "./components/PageBanner.jsx";
@@ -24,7 +23,7 @@ const pages = {
   "/about": {
     title: "About Springlands Hotel | Moshi, Tanzania",
     description: "Get to know Springlands Hotel, a welcoming place to pause before the climb, after the safari, or whenever Moshi calls.",
-    heading: "A welcome in Moshi",
+    heading: "About Springlands Hotel",
     image: "about",
   },
   "/rooms": {
@@ -63,16 +62,9 @@ function HomePage({ onSelectRoom }) {
   return (
     <>
       <Hero />
-      <div className="brand-strip">
-        <span>{hotel.location}</span>
-        <span className="strip-flower" aria-hidden="true">✳</span>
-        <span>Mount Kilimanjaro</span>
-        <span className="strip-flower" aria-hidden="true">✳</span>
-        <span>Warm Tanzanian hospitality</span>
-      </div>
       <AboutSection />
-      <RoomsSection onSelectRoom={onSelectRoom} preview />
       <FacilitiesSection preview />
+      <RoomsSection onSelectRoom={onSelectRoom} preview />
       <ExperiencesSection preview />
       <GallerySection preview />
       <FaqSection />

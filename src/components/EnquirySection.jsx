@@ -82,7 +82,7 @@ export default function EnquirySection({ roomPreference, onRoomPreferenceChange 
           </label>
           <label className="form-wide">Additional message<textarea name="message" rows="3" value={values.message} onChange={update} /></label>
         </div>
-        <button className="button button-dark form-submit" type="submit">Continue in WhatsApp <span aria-hidden="true">↗</span></button>
+        <button className="button button-dark form-submit" type="submit">Send <span aria-hidden="true">↗</span></button>
         <p className="form-status" role="status" aria-live="polite">
           {notice}
           {whatsAppFallback && <> <a href={whatsAppFallback} target="_blank" rel="noopener noreferrer">Open WhatsApp</a></>}

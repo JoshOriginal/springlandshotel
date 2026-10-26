@@ -9,7 +9,7 @@ import {
 const bannerImages = {
   about: aboutImage,
   rooms: roomOverviewImage,
-  facilities: facilityImages[0],
+  facilities: facilityImages.find((image) => image.title === "Swimming Pool"),
   experiences: attractionImages["Mount Kilimanjaro"],
   gallery: galleryImages[0],
   contact: facilityImages[1],

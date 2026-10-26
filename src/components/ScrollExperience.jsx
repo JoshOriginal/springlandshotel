@@ -5,7 +5,6 @@ const revealSelector = [
   ".about-grid h2",
   ".about-copy > p",
   ".about-photo",
-  ".about-stats > div",
   ".section-heading-row h2",
   ".section-intro",
   ".room-card",

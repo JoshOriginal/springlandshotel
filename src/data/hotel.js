@@ -8,3 +8,10 @@ export const hotel = {
   family:
     "Springlands Hotel is part of the wider Zara Tanzania Adventures hospitality family.",
 };
+
+export const socialLinks = [
+  { platform: "facebook", label: "Facebook", href: null },
+  { platform: "instagram", label: "Instagram", href: null },
+  { platform: "youtube", label: "YouTube", href: null },
+  { platform: "whatsapp", label: "WhatsApp", href: "https://wa.me/255753997777" },
+];

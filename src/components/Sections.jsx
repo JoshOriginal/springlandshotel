@@ -3,7 +3,6 @@ import { attractions } from "../data/attractions.js";
 import { facilities } from "../data/facilities.js";
 import { faqs } from "../data/faqs.js";
 import {
-  aboutImage,
   attractionImages,
   facilityImages,
   galleryImages,
@@ -27,39 +26,28 @@ function RoomPhotoPlaceholder({ roomName, onClick }) {
 }
 
 export function AboutSection() {
+  const benefits = [
+    ["Comfortable accommodation", "Room options for solo travelers, couples, and groups."],
+    ["Tropical gardens", "Relax outdoors in the hotel's garden setting."],
+    ["Outdoor swimming pool", "Cool off between climbs, safaris, and other adventures."],
+    ["Restaurant and café", "Enjoy meals and a relaxed coffee break on site."],
+    ["Warm Tanzanian hospitality", "A welcoming team and a comfortable place to pause."],
+    ["A base in Moshi", "Stay close to the region's climbing and safari experiences."],
+  ];
+
   return (
-    <section className="section about-section" id="about">
-      <div className="section-index">01 <span>·</span> A WELCOME IN MOSHI</div>
-      <div className="about-grid">
-        <div className="about-lead-column">
-          <div>
-            <p className="eyebrow eyebrow-green">A place to pause</p>
-            <h2><span className="heading-reveal-line">Where comfort</span><span className="heading-reveal-line">meets <em>adventure.</em></span></h2>
-          </div>
-          <figure className="about-photo">
-            <img
-              src={aboutImage.src}
-              srcSet={aboutImage.srcSet}
-              sizes="(max-width: 700px) 100vw, 45vw"
-              width={aboutImage.originalDimensions.width}
-              height={aboutImage.originalDimensions.height}
-              alt={aboutImage.alt}
-              loading="lazy"
-            />
-            <figcaption>Springlands Hotel · Courtyard and gardens</figcaption>
-          </figure>
-        </div>
-        <div className="about-copy">
-          <p className="lead">{`A peaceful place to land before the climb, after the safari, or simply whenever Moshi calls.`}</p>
-          <p>{`Settle into comfortable accommodation, unwind in tropical gardens, cool off in the outdoor pool, and enjoy dining with a friendly team. Springlands welcomes solo travelers, couples, groups, climbers, safari travelers, and holidaymakers.`}</p>
-          <p className="family-note">Part of the wider Zara Tanzania Adventures hospitality family.</p>
-          <a className="text-link text-link-green" href="/facilities">Get to know the hotel <span aria-hidden="true">→</span></a>
-        </div>
+    <section className="section about-section why-stay-section" id="about">
+      <div className="why-stay-heading">
+        <h2>Why Stay With Us?</h2>
+        <p>Comfort, outdoor spaces, and a welcoming Moshi base for the next part of your journey.</p>
       </div>
-      <div className="about-stats" aria-label="Hotel highlights">
-        <div><strong>01</strong><span>Welcoming base<br />in Moshi</span></div>
-        <div><strong>02</strong><span>Rest between<br />adventures</span></div>
-        <div><strong>03</strong><span>Warm Tanzanian<br />hospitality</span></div>
+      <div className="why-benefit-grid">
+        {benefits.map(([title, description]) => (
+          <article className="why-benefit" key={title}>
+            <h3>{title}</h3>
+            <p>{description}</p>
+          </article>
+        ))}
       </div>
     </section>
   );
@@ -78,10 +66,8 @@ export function RoomsSection({ onSelectRoom, preview = false }) {
 
   return (
     <section className="section rooms-section" id="accommodation">
-      <div className="section-index">02 <span>·</span> ACCOMMODATION</div>
       <div className="section-heading-row">
         <div>
-          <p className="eyebrow eyebrow-green">Find your place to rest</p>
           <h2><span className="heading-reveal-line">Room for every</span><span className="heading-reveal-line"><em>kind of journey.</em></span></h2>
         </div>
         <p className="section-intro">From a quiet solo stay to a room shared with your trekking team, choose the accommodation that suits your time in Moshi.</p>
@@ -204,11 +190,14 @@ export function FacilitiesSection({ preview = false }) {
 
   return (
     <section className="section facilities-section" id="facilities">
-      <div className="section-index">03 <span>·</span> THOUGHTFUL COMFORTS</div>
+      {preview && (
+        <div className="facility-photo-grid">
+          {displayedFacilityImages.map((image) => <FacilityPhoto image={image} key={image.filename} />)}
+        </div>
+      )}
       <div className="facilities-layout">
         <div className="facilities-intro">
-          <p className="eyebrow">Make yourself at home</p>
-          <h2><span className="heading-reveal-line">Little comforts.</span><span className="heading-reveal-line"><em>More moments.</em></span></h2>
+          <h2>{preview ? "Comforts for your stay" : "Facilities & Dining"}</h2>
           <p>Everything you need to settle in, recharge, and get ready for what comes next.</p>
           <a className="button button-light" href="/contact#enquiry">Ask about your stay <span aria-hidden="true">↗</span></a>
         </div>
@@ -222,24 +211,34 @@ export function FacilitiesSection({ preview = false }) {
           ))}
         </div>
       </div>
-      <div className="facility-photos">
-        {displayedFacilityImages.map((image) => (
-          <figure key={image.filename}>
-            <img
-              src={image.src}
-              srcSet={image.srcSet}
-              sizes="(max-width: 700px) 100vw, 25vw"
-              width={image.originalDimensions.width}
-              height={image.originalDimensions.height}
-              alt={image.alt}
-              loading="lazy"
-            />
-            <figcaption>{image.title}</figcaption>
-          </figure>
-        ))}
-      </div>
-      {preview && <a className="section-more-link section-more-link-light" href="/facilities">View all facilities & services <span aria-hidden="true">→</span></a>}
+      {!preview && (
+        <div className="facility-photo-grid">
+          {facilityImages.map((image) => <FacilityPhoto image={image} key={image.filename} />)}
+        </div>
+      )}
+      <a className="section-more-link section-more-link-light" href="/facilities">View All Facilities &amp; Services <span aria-hidden="true">→</span></a>
     </section>
+  );
+}
+
+function FacilityPhoto({ image }) {
+  return (
+    <figure className="facility-photo-card">
+      <img
+        src={image.src}
+        srcSet={image.srcSet}
+        sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 25vw"
+        width={image.originalDimensions.width}
+        height={image.originalDimensions.height}
+        alt={image.alt}
+        loading="lazy"
+        decoding="async"
+      />
+      <figcaption>
+        <strong>{image.title}</strong>
+        <span>{image.description}</span>
+      </figcaption>
+    </figure>
   );
 }
 
@@ -248,10 +247,8 @@ export function ExperiencesSection({ preview = false }) {
 
   return (
     <section className="section experiences-section" id="experiences">
-      <div className="section-index">04 <span>·</span> OUT AND ABOUT</div>
       <div className="section-heading-row">
         <div>
-          <p className="eyebrow eyebrow-green">A northern Tanzania welcome</p>
           <h2><span className="heading-reveal-line">Discover more of</span><span className="heading-reveal-line"><em>northern Tanzania.</em></span></h2>
         </div>
         <div className="experience-aside">
@@ -355,7 +352,6 @@ export function GallerySection({ preview = false }) {
 
   return (
     <section className="section gallery-section" id="gallery">
-      <div className="section-index">05 <span>·</span> A GLIMPSE OF SPRINGLANDS</div>
       <div className="gallery-heading">
         <div>
           <p className="eyebrow eyebrow-green">Gallery</p>
@@ -473,7 +469,6 @@ export function FaqSection() {
   if (!faqs.length) return null;
   return (
     <section className="section faq-section" id="faqs">
-      <div className="section-index">06 <span>·</span> GOOD TO KNOW</div>
       <div className="faq-content">
         <div><p className="eyebrow eyebrow-green">Your questions</p><h2><span className="heading-reveal-line">Good <em>to know.</em></span></h2></div>
         <div>{faqs.map((faq) => <details key={faq.question}><summary>{faq.question}</summary><p>{faq.answer}</p></details>)}</div>
