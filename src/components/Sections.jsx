@@ -3,12 +3,14 @@ import { attractions } from "../data/attractions.js";
 import { facilities } from "../data/facilities.js";
 import { faqs } from "../data/faqs.js";
 import {
+  aboutImage,
   attractionImages,
   facilityImages,
   galleryImages,
   roomImages,
 } from "../data/imageManifest.js";
 import { rooms } from "../data/rooms.js";
+import { hotel } from "../data/hotel.js";
 
 function RoomPhotoPlaceholder({ roomName, onClick }) {
   return (
@@ -25,7 +27,7 @@ function RoomPhotoPlaceholder({ roomName, onClick }) {
   );
 }
 
-export function AboutSection() {
+export function AboutSection({ preview = false }) {
   const benefits = [
     ["Comfortable accommodation", "Room options for solo travelers, couples, and groups."],
     ["Tropical gardens", "Relax outdoors in the hotel's garden setting."],
@@ -37,6 +39,29 @@ export function AboutSection() {
 
   return (
     <section className="section about-section why-stay-section" id="about">
+      {!preview && (
+        <div className="about-story">
+          <div className="about-story-copy">
+            <p className="eyebrow eyebrow-green">About Springlands</p>
+            <h2>A welcoming base <em>in Moshi.</em></h2>
+            <p>{hotel.introduction}</p>
+            <p className="about-family-note">{hotel.family}</p>
+            <a className="text-link text-link-green" href="/rooms">Explore accommodation <span aria-hidden="true">→</span></a>
+          </div>
+          <figure className="about-story-photo">
+            <img
+              src={aboutImage.src}
+              srcSet={aboutImage.srcSet}
+              sizes="(max-width: 700px) 100vw, 48vw"
+              width={aboutImage.originalDimensions.width}
+              height={aboutImage.originalDimensions.height}
+              alt={aboutImage.alt}
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+        </div>
+      )}
       <div className="why-stay-heading">
         <h2>Why Stay With Us?</h2>
         <p>Comfort, outdoor spaces, and a welcoming Moshi base for the next part of your journey.</p>

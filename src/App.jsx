@@ -63,9 +63,9 @@ function HomePage({ onSelectRoom }) {
     <>
       <Hero />
       <AboutSection />
-      <FacilitiesSection preview />
       <RoomsSection onSelectRoom={onSelectRoom} preview />
       <ExperiencesSection preview />
+      <FacilitiesSection preview />
       <GallerySection preview />
       <FaqSection />
       <div className="home-contact-cta">

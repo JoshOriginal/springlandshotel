@@ -20,12 +20,24 @@ export default function Hero() {
   const [previousIndex, setPreviousIndex] = useState(null);
   const [timerResetKey, setTimerResetKey] = useState(0);
   const [loadError, setLoadError] = useState("");
+  const [isHovered, setIsHovered] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(
+    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
   const swipeStart = useRef(null);
   const requestId = useRef(0);
   const imageCache = useRef(new Map());
   const activeSlide = slides[activeIndex];
   const previousSlide = previousIndex === null ? null : slides[previousIndex];
   const nextIndex = (activeIndex + 1) % slides.length;
+
+  useEffect(() => {
+    const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updatePreference = () => setPrefersReducedMotion(motionPreference.matches);
+    motionPreference.addEventListener("change", updatePreference);
+    return () => motionPreference.removeEventListener("change", updatePreference);
+  }, []);
 
   const preloadSlide = useCallback((slide, priority = "low") => {
     const filename = slide?.image?.filename;
@@ -74,13 +86,13 @@ export default function Hero() {
   }, [activeIndex, showSlide, slides.length]);
 
   useEffect(() => {
-    if (slides.length < 2) return undefined;
+    if (slides.length < 2 || isHovered || isFocused || prefersReducedMotion) return undefined;
     const timer = window.setTimeout(() => {
       setPreviousIndex(activeIndex);
       setActiveIndex((index) => (index + 1) % slides.length);
     }, 3000);
     return () => window.clearTimeout(timer);
-  }, [activeIndex, slides.length, timerResetKey]);
+  }, [activeIndex, isFocused, isHovered, prefersReducedMotion, slides.length, timerResetKey]);
 
   useEffect(() => {
     if (!previousSlide) return undefined;
@@ -124,6 +136,12 @@ export default function Hero() {
       aria-labelledby="hero-title"
       aria-roledescription="carousel"
       aria-label="Springlands Hotel photography"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onFocusCapture={() => setIsFocused(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setIsFocused(false);
+      }}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerCancel={() => { swipeStart.current = null; }}
@@ -166,10 +184,16 @@ export default function Hero() {
           decoding="async"
           style={{ objectPosition: activeSlide.objectPosition || "center 52%" }}
         />
-        <figcaption>{activeSlide.caption}</figcaption>
       </figure>
       <div className="hero-layout">
-        <h1 id="hero-title">Where comfort meets adventure.</h1>
+        <div className="hero-copy">
+          <p className="hero-location">Moshi, Tanzania</p>
+          <h1 id="hero-title">Where comfort meets <span className="hero-title-accent">adventure.</span></h1>
+          <div className="hero-actions">
+            <a className="button button-dark" href="/contact#enquiry">Plan your stay <span aria-hidden="true">↗</span></a>
+            <a className="button hero-secondary-action" href="/rooms">Explore accommodation <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
       </div>
       <button
         className="hero-arrow hero-arrow-previous"
