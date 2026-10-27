@@ -20,7 +20,6 @@ export default function Hero() {
   const [previousIndex, setPreviousIndex] = useState(null);
   const [timerResetKey, setTimerResetKey] = useState(0);
   const [loadError, setLoadError] = useState("");
-  const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(
     () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
@@ -86,13 +85,19 @@ export default function Hero() {
   }, [activeIndex, showSlide, slides.length]);
 
   useEffect(() => {
-    if (slides.length < 2 || isHovered || isFocused || prefersReducedMotion) return undefined;
+    if (slides.length < 2 || isFocused || prefersReducedMotion) return undefined;
+    let cancelled = false;
     const timer = window.setTimeout(() => {
-      setPreviousIndex(activeIndex);
-      setActiveIndex((index) => (index + 1) % slides.length);
+      preloadSlide(slides[nextIndex], "high")
+        .catch(() => null)
+        .then(() => {
+          if (cancelled) return;
+          setPreviousIndex(activeIndex);
+          setActiveIndex(nextIndex);
+        });
     }, 3000);
-    return () => window.clearTimeout(timer);
-  }, [activeIndex, isFocused, isHovered, prefersReducedMotion, slides.length, timerResetKey]);
+    return () => { cancelled = true; window.clearTimeout(timer); };
+  }, [activeIndex, isFocused, nextIndex, preloadSlide, prefersReducedMotion, slides, timerResetKey]);
 
   useEffect(() => {
     if (!previousSlide) return undefined;
@@ -136,9 +141,7 @@ export default function Hero() {
       aria-labelledby="hero-title"
       aria-roledescription="carousel"
       aria-label="Springlands Hotel photography"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onFocusCapture={() => setIsFocused(true)}
+      onFocusCapture={(event) => setIsFocused(event.target.matches(":focus-visible"))}
       onBlurCapture={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) setIsFocused(false);
       }}
